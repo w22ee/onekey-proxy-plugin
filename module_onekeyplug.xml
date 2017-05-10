@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_onekeyplug" default="compile.module.onekeyplug">
+  <dirname property="module.onekeyplug.basedir" file="${ant.file.module_onekeyplug}"/>
+  
+  <property name="module.jdk.home.onekeyplug" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.onekeyplug" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.onekeyplug" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.onekeyplug" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="onekeyplug.output.dir" value="${module.onekeyplug.basedir}/out/production/onekeyPlug"/>
+  <property name="onekeyplug.testoutput.dir" value="${module.onekeyplug.basedir}/out/test/onekeyPlug"/>
+  
+  <path id="onekeyplug.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="onekeyplug.module.production.classpath">
+    <path refid="${module.jdk.classpath.onekeyplug}"/>
+  </path>
+  
+  <path id="onekeyplug.runtime.production.module.classpath">
+    <pathelement location="${onekeyplug.output.dir}"/>
+  </path>
+  
+  <path id="onekeyplug.module.classpath">
+    <path refid="${module.jdk.classpath.onekeyplug}"/>
+    <pathelement location="${onekeyplug.output.dir}"/>
+  </path>
+  
+  <path id="onekeyplug.runtime.module.classpath">
+    <pathelement location="${onekeyplug.testoutput.dir}"/>
+    <pathelement location="${onekeyplug.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.onekeyplug">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.onekeyplug">
+    <patternset refid="excluded.from.module.onekeyplug"/>
+  </patternset>
+  
+  <path id="onekeyplug.module.sourcepath">
+    <dirset dir="${module.onekeyplug.basedir}">
+      <include name="src"/>
+      <include name="resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.onekeyplug" depends="compile.module.onekeyplug.production,compile.module.onekeyplug.tests" description="Compile module onekeyPlug"/>
+  
+  <target name="compile.module.onekeyplug.production" depends="register.custom.compilers" description="Compile module onekeyPlug; production classes">
+    <mkdir dir="${onekeyplug.output.dir}"/>
+    <javac2 destdir="${onekeyplug.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.onekeyplug}/javac">
+      <compilerarg line="${compiler.args.onekeyplug}"/>
+      <bootclasspath refid="onekeyplug.module.bootclasspath"/>
+      <classpath refid="onekeyplug.module.production.classpath"/>
+      <src refid="onekeyplug.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.onekeyplug"/>
+    </javac2>
+    
+    <copy todir="${onekeyplug.output.dir}">
+      <fileset dir="${module.onekeyplug.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.onekeyplug.basedir}/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.onekeyplug.tests" depends="register.custom.compilers,compile.module.onekeyplug.production" description="compile module onekeyPlug; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.onekeyplug" description="cleanup module">
+    <delete dir="${onekeyplug.output.dir}"/>
+    <delete dir="${onekeyplug.testoutput.dir}"/>
+  </target>
+  
+  <property name="onekeyplug.plugin.path.jar" value="${module.onekeyplug.basedir}/onekeyPlug.jar"/>
+  
+  <!-- Build archive for plugin 'onekeyPlug' -->
+  <target name="plugin.build.jar.onekeyplug" depends="compile.module.onekeyplug" description="Build plugin archive for module &#39;onekeyPlug&#39;">
+    <jar destfile="${onekeyplug.plugin.path.jar}" duplicate="preserve">
+      <zipfileset dir="${module.onekeyplug.basedir}/out/production/onekeyPlug"/>
+      <zipfileset file="${module.onekeyplug.basedir}/resources/META-INF/plugin.xml" prefix="META-INF"/>
+      <manifest>
+        <attribute name="Created-By" value="IntelliJ IDEA"/>
+        <attribute name="Manifest-Version" value="1.0"/>
+      </manifest>
+    </jar>
+  </target>
+</project>
